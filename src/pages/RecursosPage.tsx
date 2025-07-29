@@ -22,7 +22,7 @@ const RecursosPage = () => {
       const matchesSearch = 
         article.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.resumen.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !selectedCategory || article.categoria === selectedCategory;
+      const matchesCategory = !selectedCategory || selectedCategory === "all" || article.categoria === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, selectedCategory]);
@@ -67,7 +67,7 @@ const RecursosPage = () => {
                   <SelectValue placeholder="Todas las categorías" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas las categorías</SelectItem>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
