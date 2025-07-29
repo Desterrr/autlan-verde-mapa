@@ -61,38 +61,35 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        {routes.map((route) => (
-          <div key={route.id}>
-            {/* Ruta */}
-            <Polyline
-              positions={route.ruta}
-              color={getRouteColor(route.tipo)}
-              weight={selectedRoute === route.id ? 6 : 4}
-              opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
-            />
-            
-            {/* Marcador del punto de inicio */}
-            {route.ruta.length > 0 && (
-              <Marker
-                position={route.ruta[0]}
-                icon={createCustomIcon(route.tipo)}
-              >
-                <Popup>
-                  <div className="p-2">
-                    <h3 className="font-semibold text-sm">{route.colonia}</h3>
-                    <p className="text-xs text-gray-600">{route.horario}</p>
-                    <p className="text-xs text-gray-600">
-                      {route.dias.join(', ')}
-                    </p>
-                    <p className="text-xs text-gray-600 capitalize">
-                      Tipo: {route.tipo}
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            )}
-          </div>
-        ))}
+        {routes.map((route) => [
+          <Polyline
+            key={`polyline-${route.id}`}
+            positions={route.ruta}
+            color={getRouteColor(route.tipo)}
+            weight={selectedRoute === route.id ? 6 : 4}
+            opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
+          />,
+          route.ruta.length > 0 && (
+            <Marker
+              key={`marker-${route.id}`}
+              position={route.ruta[0]}
+              icon={createCustomIcon(route.tipo)}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold text-sm">{route.colonia}</h3>
+                  <p className="text-xs text-gray-600">{route.horario}</p>
+                  <p className="text-xs text-gray-600">
+                    {route.dias.join(', ')}
+                  </p>
+                  <p className="text-xs text-gray-600 capitalize">
+                    Tipo: {route.tipo}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )
+        ]).flat()}
       </MapContainer>
     </div>
   );
