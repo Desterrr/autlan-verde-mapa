@@ -36,39 +36,44 @@ const RouteElements = ({ routes, selectedRoute }: RouteElementsProps) => {
     });
   };
 
-  return (
-    <>
-      {routes.map((route) => (
-        <React.Fragment key={route.id}>
-          <Polyline
-            positions={route.ruta}
-            color={getRouteColor(route.tipo)}
-            weight={selectedRoute === route.id ? 6 : 4}
-            opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
-          />
-          {route.ruta.length > 0 && (
-            <Marker
-              position={route.ruta[0]}
-              icon={createCustomIcon(route.tipo)}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-semibold text-sm">{route.colonia}</h3>
-                  <p className="text-xs text-gray-600">{route.horario}</p>
-                  <p className="text-xs text-gray-600">
-                    {route.dias.join(', ')}
-                  </p>
-                  <p className="text-xs text-gray-600 capitalize">
-                    Tipo: {route.tipo}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          )}
-        </React.Fragment>
-      ))}
-    </>
-  );
+  const elements = [];
+  
+  routes.forEach((route) => {
+    elements.push(
+      <Polyline
+        key={`polyline-${route.id}`}
+        positions={route.ruta}
+        color={getRouteColor(route.tipo)}
+        weight={selectedRoute === route.id ? 6 : 4}
+        opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
+      />
+    );
+    
+    if (route.ruta.length > 0) {
+      elements.push(
+        <Marker
+          key={`marker-${route.id}`}
+          position={route.ruta[0]}
+          icon={createCustomIcon(route.tipo)}
+        >
+          <Popup>
+            <div className="p-2">
+              <h3 className="font-semibold text-sm">{route.colonia}</h3>
+              <p className="text-xs text-gray-600">{route.horario}</p>
+              <p className="text-xs text-gray-600">
+                {route.dias.join(', ')}
+              </p>
+              <p className="text-xs text-gray-600 capitalize">
+                Tipo: {route.tipo}
+              </p>
+            </div>
+          </Popup>
+        </Marker>
+      );
+    }
+  });
+
+  return elements;
 };
 
 export default RouteElements;
