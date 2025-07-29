@@ -48,6 +48,49 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
     });
   };
 
+  const renderRoutes = () => {
+    const elements = [];
+    
+    routes.forEach((route) => {
+      // Add polyline
+      elements.push(
+        <Polyline
+          key={`polyline-${route.id}`}
+          positions={route.ruta}
+          color={getRouteColor(route.tipo)}
+          weight={selectedRoute === route.id ? 6 : 4}
+          opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
+        />
+      );
+      
+      // Add marker if route has positions
+      if (route.ruta.length > 0) {
+        elements.push(
+          <Marker
+            key={`marker-${route.id}`}
+            position={route.ruta[0]}
+            icon={createCustomIcon(route.tipo)}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold text-sm">{route.colonia}</h3>
+                <p className="text-xs text-gray-600">{route.horario}</p>
+                <p className="text-xs text-gray-600">
+                  {route.dias.join(', ')}
+                </p>
+                <p className="text-xs text-gray-600 capitalize">
+                  Tipo: {route.tipo}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        );
+      }
+    });
+    
+    return elements;
+  };
+
   return (
     <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
       <MapContainer
@@ -60,36 +103,7 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
-        {routes.map((route) => (
-          <React.Fragment key={route.id}>
-            <Polyline
-              positions={route.ruta}
-              color={getRouteColor(route.tipo)}
-              weight={selectedRoute === route.id ? 6 : 4}
-              opacity={selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8}
-            />
-            {route.ruta.length > 0 && (
-              <Marker
-                position={route.ruta[0]}
-                icon={createCustomIcon(route.tipo)}
-              >
-                <Popup>
-                  <div className="p-2">
-                    <h3 className="font-semibold text-sm">{route.colonia}</h3>
-                    <p className="text-xs text-gray-600">{route.horario}</p>
-                    <p className="text-xs text-gray-600">
-                      {route.dias.join(', ')}
-                    </p>
-                    <p className="text-xs text-gray-600 capitalize">
-                      Tipo: {route.tipo}
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            )}
-          </React.Fragment>
-        ))}
+        {renderRoutes()}
       </MapContainer>
     </div>
   );
