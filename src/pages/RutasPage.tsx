@@ -16,7 +16,7 @@ const RutasPage = () => {
   const filteredRoutes = useMemo(() => {
     return mockRoutes.filter(route => {
       const matchesSearch = route.colonia.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesColonia = !selectedColonia || route.colonia === selectedColonia;
+      const matchesColonia = !selectedColonia || selectedColonia === "all" || route.colonia === selectedColonia;
       return matchesSearch && matchesColonia;
     });
   }, [searchTerm, selectedColonia]);
@@ -65,7 +65,7 @@ const RutasPage = () => {
                   <SelectValue placeholder="Todas las colonias" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas las colonias</SelectItem>
+                  <SelectItem value="all">Todas las colonias</SelectItem>
                   {colonias.map((colonia) => (
                     <SelectItem key={colonia} value={colonia}>
                       {colonia}
@@ -76,7 +76,7 @@ const RutasPage = () => {
               <Button 
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedColonia("");
+                  setSelectedColonia("all");
                   setSelectedRoute("");
                 }}
                 variant="outline"
