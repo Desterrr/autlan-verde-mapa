@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Leaf, MapPin, BookOpen, Phone, Home } from "lucide-react";
+import { Menu, X, Leaf, MapPin, BookOpen, Phone, Home, Shield } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
@@ -13,6 +13,7 @@ const Navbar = () => {
     { name: "Recursos Ecológicos", href: "/recursos", icon: BookOpen },
     { name: "Acerca de", href: "/acerca", icon: Leaf },
     { name: "Contacto", href: "/contacto", icon: Phone },
+    { name: "Admin", href: "/auth", icon: Shield },
   ];
 
   return (
