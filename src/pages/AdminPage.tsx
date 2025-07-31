@@ -5,10 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, FileText, MapPin, Route, Users } from "lucide-react";
+import { LogOut, FileText, MapPin, Route, Users, Truck, UserCheck, Calendar } from "lucide-react";
 import AdminArticles from "@/components/admin/AdminArticles";
-import AdminRoutes from "@/components/admin/AdminRoutes";
+import AdminRoutesMap from "@/components/admin/AdminRoutesMap";
 import AdminColonias from "@/components/admin/AdminColonias";
+import AdminCamiones from "@/components/admin/AdminCamiones";
+import AdminChoferes from "@/components/admin/AdminChoferes";
+import AdminAsignaciones from "@/components/admin/AdminAsignaciones";
 
 const AdminPage = () => {
   const { user, loading, signOut } = useAuth();
@@ -77,7 +80,7 @@ const AdminPage = () => {
       {/* Main Content */}
       <main className="container mx-auto p-6">
         <Tabs defaultValue="articles" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsList className="grid w-full grid-cols-6 max-w-4xl">
             <TabsTrigger value="articles" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Artículos
@@ -89,6 +92,18 @@ const AdminPage = () => {
             <TabsTrigger value="colonias" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Colonias
+            </TabsTrigger>
+            <TabsTrigger value="camiones" className="flex items-center gap-2">
+              <Truck className="h-4 w-4" />
+              Camiones
+            </TabsTrigger>
+            <TabsTrigger value="choferes" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Choferes
+            </TabsTrigger>
+            <TabsTrigger value="asignaciones" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Asignaciones
             </TabsTrigger>
           </TabsList>
 

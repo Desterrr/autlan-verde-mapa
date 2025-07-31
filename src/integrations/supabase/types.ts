@@ -56,6 +56,148 @@ export type Database = {
         }
         Relationships: []
       }
+      asignaciones: {
+        Row: {
+          camion_id: string
+          chofer_id: string
+          created_at: string
+          dias_asignados: string[]
+          estado: string
+          fecha_fin: string | null
+          fecha_inicio: string
+          horario_fin: string
+          horario_inicio: string
+          id: string
+          observaciones: string | null
+          ruta_id: string
+          updated_at: string
+        }
+        Insert: {
+          camion_id: string
+          chofer_id: string
+          created_at?: string
+          dias_asignados?: string[]
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio: string
+          horario_fin: string
+          horario_inicio: string
+          id?: string
+          observaciones?: string | null
+          ruta_id: string
+          updated_at?: string
+        }
+        Update: {
+          camion_id?: string
+          chofer_id?: string
+          created_at?: string
+          dias_asignados?: string[]
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          horario_fin?: string
+          horario_inicio?: string
+          id?: string
+          observaciones?: string | null
+          ruta_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asignaciones_camion_id_fkey"
+            columns: ["camion_id"]
+            isOneToOne: false
+            referencedRelation: "camiones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asignaciones_chofer_id_fkey"
+            columns: ["chofer_id"]
+            isOneToOne: false
+            referencedRelation: "choferes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asignaciones_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camiones: {
+        Row: {
+          año: number | null
+          capacidad: string | null
+          created_at: string
+          estado: string
+          id: string
+          modelo: string
+          placa: string
+          updated_at: string
+        }
+        Insert: {
+          año?: number | null
+          capacidad?: string | null
+          created_at?: string
+          estado?: string
+          id?: string
+          modelo: string
+          placa: string
+          updated_at?: string
+        }
+        Update: {
+          año?: number | null
+          capacidad?: string | null
+          created_at?: string
+          estado?: string
+          id?: string
+          modelo?: string
+          placa?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      choferes: {
+        Row: {
+          apellido: string
+          cedula: string
+          created_at: string
+          estado: string
+          fecha_vencimiento_licencia: string | null
+          id: string
+          licencia: string
+          nombre: string
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          apellido: string
+          cedula: string
+          created_at?: string
+          estado?: string
+          fecha_vencimiento_licencia?: string | null
+          id?: string
+          licencia: string
+          nombre: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          apellido?: string
+          cedula?: string
+          created_at?: string
+          estado?: string
+          fecha_vencimiento_licencia?: string | null
+          id?: string
+          licencia?: string
+          nombre?: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       colonias: {
         Row: {
           created_at: string | null
@@ -112,6 +254,7 @@ export type Database = {
           dias: string[]
           horario: string
           id: string
+          puntos_especificos: Json | null
           ruta: Json
           tipo: Database["public"]["Enums"]["waste_type"]
           updated_at: string | null
@@ -123,6 +266,7 @@ export type Database = {
           dias: string[]
           horario: string
           id?: string
+          puntos_especificos?: Json | null
           ruta: Json
           tipo: Database["public"]["Enums"]["waste_type"]
           updated_at?: string | null
@@ -134,6 +278,7 @@ export type Database = {
           dias?: string[]
           horario?: string
           id?: string
+          puntos_especificos?: Json | null
           ruta?: Json
           tipo?: Database["public"]["Enums"]["waste_type"]
           updated_at?: string | null
