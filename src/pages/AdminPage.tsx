@@ -157,6 +157,57 @@ const AdminPage = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="camiones" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Gestión de Camiones
+                </CardTitle>
+                <CardDescription>
+                  Administra los camiones de recolección de residuos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminCamiones />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="choferes" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  Gestión de Choferes
+                </CardTitle>
+                <CardDescription>
+                  Administra los choferes de los camiones de recolección.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminChoferes />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="asignaciones" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Gestión de Asignaciones
+                </CardTitle>
+                <CardDescription>
+                  Asigna camiones y choferes a rutas específicas con horarios.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminAsignaciones />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
