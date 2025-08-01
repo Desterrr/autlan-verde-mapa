@@ -136,7 +136,7 @@ const AdminPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <AdminRoutes />
+                <AdminRoutesMap />
               </CardContent>
             </Card>
           </TabsContent>
