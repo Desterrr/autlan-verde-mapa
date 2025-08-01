@@ -15,7 +15,7 @@ interface RouteData {
   colonia: string;
   horario: string;
   dias: string[];
-  ruta: [number, number][];
+  ruta: [number, number][] | string; // Can be array or JSON string
   tipo: 'organico' | 'inorganico' | 'mixto';
 }
 
@@ -80,10 +80,35 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
 
     // Add new route layers
     routes.forEach((route) => {
-      if (route.ruta.length === 0) return;
+      // Parse ruta data safely
+      let rutaCoordinates: [number, number][] = [];
+      
+      try {
+        if (typeof route.ruta === 'string') {
+          rutaCoordinates = JSON.parse(route.ruta);
+        } else if (Array.isArray(route.ruta)) {
+          rutaCoordinates = route.ruta;
+        }
+      } catch (error) {
+        console.error('Error parsing ruta coordinates:', error);
+        return;
+      }
+
+      if (!rutaCoordinates || rutaCoordinates.length === 0) return;
+
+      // Validate coordinates
+      const validCoordinates = rutaCoordinates.filter(coord => 
+        Array.isArray(coord) && 
+        coord.length === 2 && 
+        typeof coord[0] === 'number' && 
+        typeof coord[1] === 'number' &&
+        !isNaN(coord[0]) && !isNaN(coord[1])
+      );
+
+      if (validCoordinates.length === 0) return;
 
       // Add polyline
-      const polyline = L.polyline(route.ruta, {
+      const polyline = L.polyline(validCoordinates, {
         color: getRouteColor(route.tipo),
         weight: selectedRoute === route.id ? 6 : 4,
         opacity: selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8
@@ -92,8 +117,8 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
       polyline.addTo(mapInstanceRef.current!);
       layersRef.current.push(polyline);
 
-      // Add marker
-      const marker = L.marker(route.ruta[0], {
+      // Add marker at first coordinate
+      const marker = L.marker(validCoordinates[0], {
         icon: createCustomIcon(route.tipo)
       });
 
