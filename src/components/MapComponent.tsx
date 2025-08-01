@@ -16,6 +16,7 @@ interface RouteData {
   horario: string;
   dias: string[];
   ruta: [number, number][] | string; // Can be array or JSON string
+  puntos_especificos?: Array<{lat: number, lng: number}> | string; // Specific points
   tipo: 'organico' | 'inorganico' | 'mixto';
 }
 
@@ -91,48 +92,80 @@ const MapComponent = ({ routes, selectedRoute }: MapComponentProps) => {
         }
       } catch (error) {
         console.error('Error parsing ruta coordinates:', error);
-        return;
       }
 
-      if (!rutaCoordinates || rutaCoordinates.length === 0) return;
-
-      // Validate coordinates
-      const validCoordinates = rutaCoordinates.filter(coord => 
-        Array.isArray(coord) && 
-        coord.length === 2 && 
-        typeof coord[0] === 'number' && 
-        typeof coord[1] === 'number' &&
-        !isNaN(coord[0]) && !isNaN(coord[1])
-      );
-
-      if (validCoordinates.length === 0) return;
-
-      // Add polyline
-      const polyline = L.polyline(validCoordinates, {
-        color: getRouteColor(route.tipo),
-        weight: selectedRoute === route.id ? 6 : 4,
-        opacity: selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8
-      });
+      // Parse puntos_especificos data safely
+      let puntosEspecificos: Array<{lat: number, lng: number}> = [];
       
-      polyline.addTo(mapInstanceRef.current!);
-      layersRef.current.push(polyline);
+      try {
+        if (route.puntos_especificos) {
+          if (typeof route.puntos_especificos === 'string') {
+            puntosEspecificos = JSON.parse(route.puntos_especificos);
+          } else if (Array.isArray(route.puntos_especificos)) {
+            puntosEspecificos = route.puntos_especificos;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing puntos específicos:', error);
+      }
 
-      // Add marker at first coordinate
-      const marker = L.marker(validCoordinates[0], {
-        icon: createCustomIcon(route.tipo)
+      // Use puntos específicos if available, otherwise use ruta coordinates
+      const coordinatesToShow = puntosEspecificos.length > 0 ? puntosEspecificos : rutaCoordinates;
+
+      if (!coordinatesToShow || coordinatesToShow.length === 0) return;
+
+      // Convert puntos específicos to coordinate format if needed
+      let displayCoordinates: [number, number][] = [];
+      
+      if (puntosEspecificos.length > 0) {
+        displayCoordinates = puntosEspecificos.map(punto => [punto.lat, punto.lng]);
+      } else {
+        // Validate ruta coordinates
+        displayCoordinates = rutaCoordinates.filter(coord => 
+          Array.isArray(coord) && 
+          coord.length === 2 && 
+          typeof coord[0] === 'number' && 
+          typeof coord[1] === 'number' &&
+          !isNaN(coord[0]) && !isNaN(coord[1])
+        );
+      }
+
+      if (displayCoordinates.length === 0) return;
+
+      // Add polyline if we have multiple points
+      if (displayCoordinates.length > 1) {
+        const polyline = L.polyline(displayCoordinates, {
+          color: getRouteColor(route.tipo),
+          weight: selectedRoute === route.id ? 6 : 4,
+          opacity: selectedRoute && selectedRoute !== route.id ? 0.3 : 0.8
+        });
+        
+        polyline.addTo(mapInstanceRef.current!);
+        layersRef.current.push(polyline);
+      }
+
+      // Add markers for each point
+      displayCoordinates.forEach((coord, index) => {
+        const marker = L.marker(coord, {
+          icon: createCustomIcon(route.tipo)
+        });
+
+        const isMainPoint = index === 0;
+        const pointLabel = puntosEspecificos.length > 0 ? `Punto ${index + 1}` : 'Inicio de ruta';
+
+        marker.bindPopup(`
+          <div class="p-2">
+            <h3 class="font-semibold text-sm">${route.colonia}</h3>
+            <p class="text-xs text-gray-600 font-medium">${pointLabel}</p>
+            <p class="text-xs text-gray-600">${route.horario}</p>
+            <p class="text-xs text-gray-600">${route.dias.join(', ')}</p>
+            <p class="text-xs text-gray-600 capitalize">Tipo: ${route.tipo}</p>
+          </div>
+        `);
+
+        marker.addTo(mapInstanceRef.current!);
+        layersRef.current.push(marker);
       });
-
-      marker.bindPopup(`
-        <div class="p-2">
-          <h3 class="font-semibold text-sm">${route.colonia}</h3>
-          <p class="text-xs text-gray-600">${route.horario}</p>
-          <p class="text-xs text-gray-600">${route.dias.join(', ')}</p>
-          <p class="text-xs text-gray-600 capitalize">Tipo: ${route.tipo}</p>
-        </div>
-      `);
-
-      marker.addTo(mapInstanceRef.current!);
-      layersRef.current.push(marker);
     });
   }, [routes, selectedRoute]);
 
