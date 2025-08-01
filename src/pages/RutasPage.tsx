@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,20 +6,58 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, Clock, Calendar, Recycle } from "lucide-react";
 import MapComponent from "@/components/MapComponent";
-import { mockRoutes, colonias } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 
 const RutasPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedColonia, setSelectedColonia] = useState<string>("");
   const [selectedRoute, setSelectedRoute] = useState<string>("");
+  const [routes, setRoutes] = useState<any[]>([]);
+  const [colonias, setColonias] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRoutes();
+    fetchColonias();
+  }, []);
+
+  const fetchRoutes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('routes')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setRoutes(data || []);
+    } catch (error) {
+      console.error('Error fetching routes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchColonias = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('colonias')
+        .select('name')
+        .order('name');
+      
+      if (error) throw error;
+      setColonias(data?.map(col => col.name) || []);
+    } catch (error) {
+      console.error('Error fetching colonias:', error);
+    }
+  };
 
   const filteredRoutes = useMemo(() => {
-    return mockRoutes.filter(route => {
+    return routes.filter(route => {
       const matchesSearch = route.colonia.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesColonia = !selectedColonia || selectedColonia === "all" || route.colonia === selectedColonia;
       return matchesSearch && matchesColonia;
     });
-  }, [searchTerm, selectedColonia]);
+  }, [routes, searchTerm, selectedColonia]);
 
   const getTypeColor = (tipo: string) => {
     switch (tipo) {
@@ -33,6 +71,17 @@ const RutasPage = () => {
   const getTypeIcon = (tipo: string) => {
     return <Recycle className="h-4 w-4" />;
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Cargando rutas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

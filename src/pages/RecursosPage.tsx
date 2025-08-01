@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,26 +6,49 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, BookOpen, Calendar, User, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ecoArticles } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 
 const RecursosPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const categories = useMemo(() => {
-    const cats = ecoArticles.map(article => article.categoria);
-    return [...new Set(cats)];
+  useEffect(() => {
+    fetchArticles();
   }, []);
 
+  const fetchArticles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setArticles(data || []);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = useMemo(() => {
+    const cats = articles.map(article => article.categoria);
+    return [...new Set(cats)];
+  }, [articles]);
+
   const filteredArticles = useMemo(() => {
-    return ecoArticles.filter(article => {
+    return articles.filter(article => {
       const matchesSearch = 
         article.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.resumen.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = !selectedCategory || selectedCategory === "all" || article.categoria === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [articles, searchTerm, selectedCategory]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-MX', {
@@ -131,10 +154,10 @@ const RecursosPage = () => {
                   
                   <CardContent>
                     <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {formatDate(article.fechaPublicacion)}
-                      </div>
+                       <div className="flex items-center">
+                         <Calendar className="h-4 w-4 mr-1" />
+                         {formatDate(article.fecha_publicacion)}
+                       </div>
                       <div className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
                         {article.autor}
