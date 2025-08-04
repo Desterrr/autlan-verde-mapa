@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Leaf, MapPin, BookOpen, Phone, Home, Shield } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Menu, X, Leaf, MapPin, BookOpen, Phone, Home, Settings } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showAdminAccess, setShowAdminAccess] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const navigation = [
     { name: "Inicio", href: "/", icon: Home },
@@ -13,8 +18,42 @@ const Navbar = () => {
     { name: "Recursos Ecológicos", href: "/recursos", icon: BookOpen },
     { name: "Acerca de", href: "/acerca", icon: Leaf },
     { name: "Contacto", href: "/contacto", icon: Phone },
-    { name: "Admin", href: "/auth", icon: Shield },
   ];
+
+  // Verificar si el usuario es admin
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setShowAdminAccess(false);
+        return;
+      }
+
+      try {
+        const { data } = await supabase.rpc('has_role', {
+          _user_id: user.id,
+          _role: 'admin'
+        });
+        setShowAdminAccess(data);
+      } catch (error) {
+        setShowAdminAccess(false);
+      }
+    };
+
+    checkAdminRole();
+  }, [user]);
+
+  // Combinación de teclas secreta para acceder al admin (Ctrl+Alt+A)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        navigate('/admin');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   return (
     <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b border-border">
@@ -50,6 +89,20 @@ const Navbar = () => {
                   </Link>
                 );
               })}
+              {/* Enlace discreto de admin solo visible para administradores */}
+              {showAdminAccess && (
+                <Link
+                  to="/admin"
+                  className={`flex items-center space-x-1 px-2 py-1 rounded-md text-xs font-medium transition-colors opacity-50 hover:opacity-100 ${
+                    location.pathname === '/admin'
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                  title="Panel de Administración"
+                >
+                  <Settings className="h-3 w-3" />
+                </Link>
+              )}
             </div>
           </div>
 
@@ -90,6 +143,21 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            {/* Enlace discreto de admin para móvil */}
+            {showAdminAccess && (
+              <Link
+                to="/admin"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors opacity-70 ${
+                  location.pathname === '/admin'
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                <Settings className="h-4 w-4" />
+                <span>Admin</span>
+              </Link>
+            )}
           </div>
         </div>
       )}
