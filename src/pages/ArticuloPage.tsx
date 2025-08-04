@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, User, Share2, BookOpen } from "lucide-react";
 import { ecoArticles } from "@/data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { parseAndSanitizeContent } from "@/utils/sanitizer";
 
 const ArticuloPage = () => {
   const { id } = useParams();
@@ -126,30 +127,11 @@ const ArticuloPage = () => {
                       className="w-full h-64 object-cover rounded-lg mb-8"
                     />
                     
-                    {/* Article Content */}
+                    {/* Article Content - XSS Safe */}
                     <div 
                       className="prose prose-lg max-w-none"
                       dangerouslySetInnerHTML={{
-                        __html: article.contenido
-                          .split('\n')
-                          .map(line => {
-                            if (line.startsWith('# ')) {
-                              return `<h1 class="text-3xl font-bold text-foreground mt-8 mb-4">${line.substring(2)}</h1>`;
-                            } else if (line.startsWith('## ')) {
-                              return `<h2 class="text-2xl font-semibold text-foreground mt-6 mb-3">${line.substring(3)}</h2>`;
-                            } else if (line.startsWith('### ')) {
-                              return `<h3 class="text-xl font-semibold text-foreground mt-4 mb-2">${line.substring(4)}</h3>`;
-                            } else if (line.startsWith('- ')) {
-                              return `<li class="text-muted-foreground mb-1">${line.substring(2)}</li>`;
-                            } else if (line.startsWith('**') && line.endsWith('**')) {
-                              return `<h4 class="font-semibold text-foreground mt-4 mb-2">${line.slice(2, -2)}</h4>`;
-                            } else if (line.trim() === '') {
-                              return '<br>';
-                            } else {
-                              return `<p class="text-muted-foreground mb-4 leading-relaxed">${line}</p>`;
-                            }
-                          })
-                          .join('')
+                        __html: parseAndSanitizeContent(article.contenido)
                       }}
                     />
                   </CardContent>
