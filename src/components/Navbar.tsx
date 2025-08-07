@@ -4,6 +4,7 @@ import { Menu, X, Leaf, MapPin, BookOpen, Phone, Home, Settings } from "lucide-r
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
+import logoAutlan from "@/assets/logo-autlan.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,7 +62,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Leaf className="h-8 w-8 text-primary" />
+            <img 
+              src={logoAutlan} 
+              alt="Logo Autlán" 
+              className="h-8 w-8 object-contain"
+            />
             <div className="flex flex-col">
               <span className="text-lg font-bold text-foreground">Ayuntamiento</span>
               <span className="text-xs text-muted-foreground">Autlán de Navarro</span>
