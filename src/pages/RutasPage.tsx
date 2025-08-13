@@ -115,7 +115,7 @@ const RutasPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas las colonias</SelectItem>
-                  {colonias.map((colonia) => (
+                  {colonias.filter(colonia => colonia && colonia.trim() !== '').map((colonia) => (
                     <SelectItem key={colonia} value={colonia}>
                       {colonia}
                     </SelectItem>
